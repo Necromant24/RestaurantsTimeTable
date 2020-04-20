@@ -37,10 +37,15 @@
         },
         computed:{
             compTable(){
-                return this.timeTable
+                return tStore.state.weekList
             }
         },
         methods:{
+            pushToTable(data){
+                let objKeys = Object.keys(data)
+                objKeys.forEach(key=>this.timeTable.push(data[key]))
+
+            },
             get7Dates3(date){
                 const getDays = (day=1) => Array.from({length:day},(_,i)=>moment(date).add(i, 'days').format('YYYY MM DD'));
 
@@ -49,8 +54,12 @@
             showTimeTable(data){
                 tStore.commit('initTimeTableOnWeek',{date:data.date,restaurant:data.restaurant,typeCoock:data.typeCoock})
                 alert(" in show method but fetching data")
-                this.timeTable = tStore.state.raspisanie[data.restaurant][data.typeCoock]
+                let recievedTable = tStore.state.raspisanie[data.restaurant][data.typeCoock]
+                //this.timeTable = recievedTable
+                console.log(recievedTable, " - recieved from store")
+                this.pushToTable(recievedTable)
                 console.log(this.timeTable," - test this.timeTable")
+                this.timeTable = recievedTable
 
                 //let weekList = this.getWorkerLists(this.date,this.restaurant,this.typeCoock)
                 //console.log(weekList," - weeklisr")

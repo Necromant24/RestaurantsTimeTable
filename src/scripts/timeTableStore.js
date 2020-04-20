@@ -13,7 +13,8 @@ export default new Vuex.Store({
                 rus: {
                 }
             }
-        }
+        },
+        weekList:[]
     },
     mutations: {
 
@@ -66,6 +67,7 @@ export default new Vuex.Store({
                     let newRasp = Object.assign(oldData,jsonData)
                     console.log(newRasp," - new raspis")
                     state.raspisanie[data.restaurant][data.typeCoock]= newRasp
+                    state.weekList = newRasp
                     //console.log(state.raspisanie.rusich.rus)
                 });
 

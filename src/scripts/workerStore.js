@@ -10,6 +10,10 @@ export default new Vuex.Store({
             // { FirstName: "oleg", CoockType: "rus", Timetable: "2/2" },
             // { FirstName: "alex", CoockType: "french", Timetable: "5/2" }
         ],
+        // firstName:{....}
+        dictWorkersData:{
+
+        }
 
     },
     mutations: {
@@ -17,6 +21,14 @@ export default new Vuex.Store({
 
         initWorkers(state, workers) {
             state.workersData = workers;
+            let dictData ={}
+            state.workersData.forEach(data=>{
+                dictData[data.firstName]={coockType:data.coockType,timetable:data.timetable}
+            })
+            state.dictWorkersData = dictData
+            console.log(state.dictWorkersData," = dicted workers data")
+
+
         },
         addWorker(state, worker) {
             fetch("http://localhost:5000/Workers", {
@@ -39,6 +51,7 @@ export default new Vuex.Store({
                 });
 
             state.workersData.push(worker);
+            state.dictWorkersData[worker.firstName]={coockType:worker.coockType,timetable:worker.timetable}
         },
         deleteWorker(state, index) {
             let workerName = state.workersData[index]["firstName"];
@@ -61,6 +74,7 @@ export default new Vuex.Store({
 
             //alert(index)
             state.workersData.splice(index, 1);
+            delete state.dictWorkersData[workerName]
         },
 
 

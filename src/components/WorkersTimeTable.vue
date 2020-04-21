@@ -59,12 +59,8 @@
             showTimeTable(data){
                 tStore.commit('initTimeTableOnWeek',{date:data.date,restaurant:data.restaurant,typeCoock:data.typeCoock})
                 alert(" in show method but fetching data")
-                let recievedTable = tStore.state.raspisanie[data.restaurant][data.typeCoock]
-                //this.timeTable = recievedTable
-                console.log(recievedTable, " - recieved from store")
-                this.pushToTable(recievedTable)
+
                 console.log(this.timeTable," - test this.timeTable")
-                this.timeTable = recievedTable
 
                 this.restaurant = data.restaurant
                 this.typeCoock = data.typeCoock
@@ -87,12 +83,15 @@
             },
             addWorker(index){
 
+                console.log(this.week," -from computed week")
+
                 let workerData = {
 
-                    date: this.week[index],
+                    date: this.compTable[index].date,
                     typeCoock: this.typeCoock,
                     restaurant: this.restaurant,
-                    name: this.addWorkerList[index]
+                    name: this.addWorkerList[index],
+                    dayIndex:index
                 }
 
                 console.log(workerData," - worker to add")

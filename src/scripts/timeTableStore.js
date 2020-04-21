@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import moment from "moment";
+import workerStore from "@/scripts/workerStore";
 
 Vue.use(Vuex);
 
@@ -8,12 +9,12 @@ export default new Vuex.Store({
     state: {
 
         // raspisanie['restaurant']['coockType']['date']([workers][index]/[weekDay])
-        raspisanie: {
-            rusich: {
-                rus: {
-                }
-            }
-        },
+        // raspisanie: {
+        //     rusich: {
+        //         rus: {
+        //         }
+        //     }
+        // },
         weekList:[],
         weekDays:[]
     },
@@ -88,9 +89,6 @@ export default new Vuex.Store({
 
 
 
-
-
-
                     state.weekList = wList
 
 
@@ -105,60 +103,34 @@ export default new Vuex.Store({
 
 
         },
-        addWorkerInTable(state, worker) {
 
-            console.log(state.raspisanie[worker.restaurant][worker.typeCoock]," -")
-            if(!Object.keys(state.raspisanie[worker.restaurant][worker.typeCoock]).includes(worker.date)){
-                console.log("not contains")
-                state.raspisanie[worker.restaurant][worker.typeCoock][worker.date]= {weekDay:new moment(worker.date).day(),workers:[]}
-            }
+        // readding worker list
+        addWorkerInTable(state, data) {
 
 
 
-
-            state.raspisanie[worker.restaurant][worker.typeCoock][worker.date][
-                "workers"
-                ].push(worker.name);
 
             let worker_timetable = {};
 
-            console.log(state.workersData);
+            state.weekList[data.dayIndex].workers.push(data.name)
 
-            function GetWorkerTable(name) {
-                console.log(state.workersData)
-                state.workersData.forEach(worker => {
-
-                    if (worker.firstName == name) {
-                        console.log(worker.firstName, "- is worker");
-                        worker_timetable[name]=worker.timetable
-                    }
-                });
+            state.weekList[data.dayIndex].workers.forEach(wname=>{
+                worker_timetable[wname]=workerStore.state.dictWorkersData[wname].timetable
+            })
 
 
-            }
 
-            let workerList =
-                state.raspisanie[worker.restaurant][worker.typeCoock][worker.date][
-                    "workers"
-                    ];
-
-            console.log(workerList, " - workerList");
-
-            //let workerNames = []
-
-            workerList.forEach(element => {
-                console.log(element," - element")
-                GetWorkerTable(element);
-            });
 
             console.log(worker_timetable," - is worker_timetable")
 
             let workerJSON = JSON.stringify({
                 Workers: JSON.stringify(worker_timetable),
-                Restaurant: worker.restaurant,
-                CoockType: worker.typeCoock,
-                Date: worker.date
+                Restaurant: data.restaurant,
+                CoockType: data.typeCoock,
+                Date: data.date
             });
+
+            console.log(workerJSON," - workers json")
 
             fetch("http://localhost:5000/TimeTable", {
                 method: "PUT",

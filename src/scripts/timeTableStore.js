@@ -14,7 +14,8 @@ export default new Vuex.Store({
                 }
             }
         },
-        weekList:[]
+        weekList:[],
+        weekDays:[]
     },
     mutations: {
 
@@ -45,7 +46,7 @@ export default new Vuex.Store({
 
             // date=2020-03-01&daysCount=2&restaurant=rusich&coockType=rus
 
-            var params = {date:data.date,daysCount:"7",restaurant:data.restaurant,coockType:data.typeCoock}
+            var params = {date:data.date,daysCount:7,restaurant:data.restaurant,coockType:data.typeCoock}
 
             url.search = new URLSearchParams(params).toString();
 
@@ -62,12 +63,43 @@ export default new Vuex.Store({
                     return data.json();
                 })
                 .then(jsonData => {
-                    console.log(data," - fetched raspisanie");
-                    let oldData = state.raspisanie[data.restaurant][data.typeCoock]
-                    let newRasp = Object.assign(oldData,jsonData)
-                    console.log(newRasp," - new raspis")
-                    state.raspisanie[data.restaurant][data.typeCoock]= newRasp
-                    state.weekList = newRasp
+                    console.log(jsonData," - fetched raspisanie");
+                    //let oldData = state.raspisanie[data.restaurant][data.typeCoock]
+                    //let newRasp = Object.assign(oldData,jsonData)
+
+                    //state.raspisanie[data.restaurant][data.typeCoock]= newRasp
+
+                    const get7Dates3 = function(date){
+                        const getDays = (day=1) => Array.from({length:day},(_,i)=>moment(date).add(i, 'days').format('YYYY MM DD'));
+
+                        return getDays(7).map(date=>date.replace(' ','-')).map(date=>date.replace(' ','-'))
+                    }
+
+
+                    state.weekDays = Object.keys(jsonData)
+
+
+                    let dates7 = get7Dates3(data.date)
+                    let wList = []
+
+                    dates7.forEach(wday=>wList.push(Object.assign({date:wday},jsonData[wday])))
+
+                    console.log(wList," - wlist")
+
+
+
+
+
+
+                    state.weekList = wList
+
+
+
+
+
+
+
+                    console.log(state.weekDays," - week days")
                     //console.log(state.raspisanie.rusich.rus)
                 });
 
@@ -144,7 +176,6 @@ export default new Vuex.Store({
 
                 });
         },
-
 
 
 

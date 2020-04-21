@@ -3,7 +3,7 @@
         <Parameters v-on:show-table="showTimeTable" />
         <div class="weekGrid">
             <div v-for="(dayList,index) in compTable" :key="index" width="10%" >
-                <h3>{{week[index]}}</h3>
+                <h3>{{dayList.date}}+{{index}}</h3>
                 <div v-for="(worker,index2) in dayList['workers']" :key="index2" width="100%">
                     {{worker}}
                     <button @click="deleteWorker(index,index2)">X</button>
@@ -30,7 +30,9 @@
         components: {Parameters},
         data: function(){
             return{
-                week: [],
+                //week: [],
+                restaurant: "",
+                typeCoock: "",
                 timeTable:[],
                 addWorkerList: ['','','','','','','','',]
             }
@@ -38,6 +40,9 @@
         computed:{
             compTable(){
                 return tStore.state.weekList
+            },
+            week(){
+                return  tStore.state.weekDays
             }
         },
         methods:{
@@ -60,6 +65,9 @@
                 this.pushToTable(recievedTable)
                 console.log(this.timeTable," - test this.timeTable")
                 this.timeTable = recievedTable
+
+                this.restaurant = data.restaurant
+                this.typeCoock = data.typeCoock
 
                 //let weekList = this.getWorkerLists(this.date,this.restaurant,this.typeCoock)
                 //console.log(weekList," - weeklisr")

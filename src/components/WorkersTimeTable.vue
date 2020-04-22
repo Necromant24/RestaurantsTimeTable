@@ -6,7 +6,7 @@
                 <h3>{{dayList.date}}+{{index}}</h3>
                 <div v-for="(worker,index2) in dayList['workers']" :key="index2" width="100%">
                     {{worker}}
-                    <button @click="deleteWorker(index,index2)">X</button>
+                    <button @click="deleteWorker(index,index2,dayList.date)">X</button>
                 </div>
                 <div class="inline">
                     <input v-model="addWorkerList[index]"/>
@@ -69,15 +69,14 @@
                 //console.log(weekList," - weeklisr")
                 //this.timeTable = weekList
             },
-            deleteWorker(weekIndex,workerIndex){
-                let curdate = this.week[weekIndex]
-                alert(curdate)
-                alert(workerIndex)
+            deleteWorker(weekIndex,workerIndex,dayDate){
+                let curdate = dayDate
                 let data = {
                     restaurant: this.restaurant,
                     typeCoock: this.typeCoock,
                     date: curdate,
-                    index: workerIndex
+                    wIndex: workerIndex,
+                    dayIndex:weekIndex
                 }
                 tStore.commit('deleteWorkerFromTable',data)
             },

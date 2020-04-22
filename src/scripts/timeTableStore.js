@@ -155,42 +155,18 @@ export default new Vuex.Store({
         deleteWorkerFromTable(state, data) {
             //restaurant,coockType,date,index
 
-            console.log(data.restaurant, data.typeCoock, data.date, data.index);
-            state.raspisanie[data.restaurant][data.typeCoock][data.date][
-                "workers"
-                ].splice(data.index, 1);
+            console.log(data," - in delete worker - data");
+
 
 
             let worker_timetable = {};
 
-            console.log(state.workersData);
+            state.weekList[data.dayIndex].workers.splice(data.wIndex,1)
 
-            function GetWorkerTable(name) {
-                console.log(state.workersData)
-                state.workersData.forEach(worker => {
+            state.weekList[data.dayIndex].workers.forEach(wname=>{
+                worker_timetable[wname]=workerStore.state.dictWorkersData[wname].timetable
+            })
 
-                    if (worker.firstName == name) {
-                        console.log(worker.firstName, "- is worker");
-                        worker_timetable[name]=worker.timetable
-                    }
-                });
-
-
-            }
-
-            let workerList =
-                state.raspisanie[data.restaurant][data.typeCoock][data.date][
-                    "workers"
-                    ];
-
-            console.log(workerList, " - workerList");
-
-            //let workerNames = []
-
-            workerList.forEach(element => {
-                console.log(element," - element")
-                GetWorkerTable(element);
-            });
 
             let workerJSON = JSON.stringify({
                 Workers: JSON.stringify(worker_timetable),

@@ -29,6 +29,9 @@ import Restaurants from "@/components/Restaurants";
 import WorkersRedactor from "@/components/WorkersRedactor";
 import WorkersTimeTable from "@/components/WorkersTimeTable";
 
+import wStore from "@/scripts/workerStore";
+import rStore from "@/scripts/restaurantStore";
+
 export default {
   name: 'App',
   components: {
@@ -41,6 +44,10 @@ export default {
       state:0,
       razdeli:["workers","time table","3","restaurants"]
     }
+  },
+  created:function(){
+    wStore.commit('initWorkers')
+    rStore.commit('initRestaurants')
   },
   methods:{
     changeState: function(index) {

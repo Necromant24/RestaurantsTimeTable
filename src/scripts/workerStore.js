@@ -18,16 +18,24 @@ export default new Vuex.Store({
     },
     mutations: {
 
+        initWorkers(state) {
 
-        initWorkers(state, workers) {
-            state.workersData = workers;
-            let dictData ={}
-            state.workersData.forEach(data=>{
-                dictData[data.firstName]={coockType:data.coockType,timetable:data.timetable}
+            fetch('http://localhost:5000/Workers',{
+                method: 'GET',
+            }).then((response)=>{
+                return response.json()
+            }).then((data)=>{
+                console.log(data['data']," - workers data")
+                //wStore.commit('initWorkers',data['data'])
+                let workers = data.data
+                state.workersData = workers;
+                let dictData ={}
+                state.workersData.forEach(data=>{
+                    dictData[data.firstName]={coockType:data.coockType,timetable:data.timetable}
+                })
+                state.dictWorkersData = dictData
+                console.log(state.dictWorkersData," = dicted workers data")
             })
-            state.dictWorkersData = dictData
-            console.log(state.dictWorkersData," = dicted workers data")
-
 
         },
         addWorker(state, worker) {
@@ -35,7 +43,6 @@ export default new Vuex.Store({
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: JSON.stringify({
                     FirstName: worker["firstName"],
@@ -62,7 +69,6 @@ export default new Vuex.Store({
                 method: "DELETE",
                 headers: {
                     "Content-Type": "text/plain"
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
                 }
             })
                 .then(data => {
@@ -72,12 +78,9 @@ export default new Vuex.Store({
                     console.log(data);
                 });
 
-            //alert(index)
             state.workersData.splice(index, 1);
             delete state.dictWorkersData[workerName]
         },
-
-
 
     }
 });

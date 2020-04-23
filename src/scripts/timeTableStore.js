@@ -7,14 +7,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-
-        // raspisanie['restaurant']['coockType']['date']([workers][index]/[weekDay])
-        // raspisanie: {
-        //     rusich: {
-        //         rus: {
-        //         }
-        //     }
-        // },
         weekList:[],
         weekDays:[]
     },
@@ -30,13 +22,6 @@ export default new Vuex.Store({
                 state.raspisanie[restaurants[i]]={rus:{},french:{},italy:{}}
             }
 
-
-            // restaurants.forEach(restaurant=>{
-            //   console.log(restaurant)
-            //   console.log("roreach")
-            //   state.raspisanie[restaurant]={rus:{},french:{},italy:{}}
-            // })
-
             console.log(state.raspisanie," - inited fields")
         },
         initTimeTableOnWeek(state,data){
@@ -44,9 +29,7 @@ export default new Vuex.Store({
 
 
             var url = new URL("http://localhost:5000/TimeTable")
-
             // date=2020-03-01&daysCount=2&restaurant=rusich&coockType=rus
-
             var params = {date:data.date,daysCount:7,restaurant:data.restaurant,coockType:data.typeCoock}
 
             url.search = new URLSearchParams(params).toString();
@@ -57,7 +40,6 @@ export default new Vuex.Store({
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
                 },
             })
                 .then(data => {
@@ -65,10 +47,6 @@ export default new Vuex.Store({
                 })
                 .then(jsonData => {
                     console.log(jsonData," - fetched raspisanie");
-                    //let oldData = state.raspisanie[data.restaurant][data.typeCoock]
-                    //let newRasp = Object.assign(oldData,jsonData)
-
-                    //state.raspisanie[data.restaurant][data.typeCoock]= newRasp
 
                     const get7Dates3 = function(date){
                         const getDays = (day=1) => Array.from({length:day},(_,i)=>moment(date).add(i, 'days').format('YYYY MM DD'));
@@ -76,9 +54,7 @@ export default new Vuex.Store({
                         return getDays(7).map(date=>date.replace(' ','-')).map(date=>date.replace(' ','-'))
                     }
 
-
                     state.weekDays = Object.keys(jsonData)
-
 
                     let dates7 = get7Dates3(data.date)
                     let wList = []
@@ -87,38 +63,117 @@ export default new Vuex.Store({
 
                     console.log(wList," - wlist")
 
-
-
                     state.weekList = wList
 
-
-
-
-
-
-
                     console.log(state.weekDays," - week days")
-                    //console.log(state.raspisanie.rusich.rus)
+
                 });
-
-
         },
 
         // readding worker list
         addWorkerInTable(state, data) {
 
 
-
-
             let worker_timetable = {};
-
             state.weekList[data.dayIndex].workers.push(data.name)
+
+
+            let workerData = workerStore.state.dictWorkersData[data.name]
+
+            let daysWork = 0;
+            let daysUnwork = 0;
+            if(workerData.Timetable==="2/2"){
+                daysWork=2
+                daysUnwork=2
+            }else {
+                daysWork=5
+                daysUnwork=2
+            }
+
+            let dayWorksCount = 0
+            let dayUnworksCount = 0
+
+            let lastWorkDay = 0
+            let firstWorkDay = data.dayIndex
+
+
+
+
+
+            // block of code with 4 fors to check valid work/unwork intervals
+            for(let i=data.dayIndex;i<7;i++){
+                if(state.weekList[i].workers.includes(data.name))
+                {
+                    dayWorksCount+=1
+                    lastWorkDay = i
+                    console.log(state.weekList[i].workers)
+                }else {
+                    break
+                }
+            }
+
+            for(let i=lastWorkDay+1;i<7;i++){
+                if(!state.weekList[i].workers.includes(data.name))
+                {
+                    dayUnworksCount+=1
+                }else {
+                    break
+                }
+            }
+
+            for(let i=data.dayIndex-1;i>=0;i--){
+                if(state.weekList[i].workers.includes(data.name))
+                {
+                    dayWorksCount+=1
+                    firstWorkDay = i
+                    console.log(state.weekList[i].workers)
+                }else {
+                    break
+                }
+            }
+
+            for(let i=firstWorkDay-1;i>=0;i--){
+                if(!state.weekList[i].workers.includes(data.name))
+                {
+                    dayUnworksCount+=1
+                }else {
+                    break
+                }
+            }
+
+
+
+
+
+
+            console.log(daysUnwork,daysWork," -daysUnwork,daysWork")
+            console.log(dayUnworksCount,dayUnworksCount,"-daysUnworksCount,daysWorksCount")
+            console.log(lastWorkDay,firstWorkDay,' - lastWorkDay,firstWorkDay')
+
+            if(dayWorksCount>daysWork){
+                alert('слишком много дней он работает')
+            }
+
+            if(dayUnworksCount<daysUnwork){
+                alert('слишком малый интервал отдыха после')
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             state.weekList[data.dayIndex].workers.forEach(wname=>{
                 worker_timetable[wname]=workerStore.state.dictWorkersData[wname].timetable
             })
-
-
 
 
             console.log(worker_timetable," - is worker_timetable")
@@ -136,7 +191,6 @@ export default new Vuex.Store({
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: workerJSON
             })
@@ -150,17 +204,13 @@ export default new Vuex.Store({
         },
 
 
-
-
         deleteWorkerFromTable(state, data) {
-            //restaurant,coockType,date,index
+            //data keys - restaurant,coockType,date,index
 
             console.log(data," - in delete worker - data");
 
 
-
             let worker_timetable = {};
-
             state.weekList[data.dayIndex].workers.splice(data.wIndex,1)
 
             state.weekList[data.dayIndex].workers.forEach(wname=>{
@@ -190,7 +240,6 @@ export default new Vuex.Store({
                     console.log(data," - removing worker in table");
 
                 });
-
 
         }
     }

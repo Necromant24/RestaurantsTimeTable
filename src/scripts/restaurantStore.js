@@ -6,13 +6,21 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         restaurants: [],
-
     },
     mutations: {
 
-        initRestaurants(state, restaurants) {
-            console.log(restaurants," - init restaurants")
-            state.restaurants = restaurants;
+        initRestaurants(state) {
+            fetch('http://localhost:5000/Restaurants',{
+                method: 'GET',
+            }).then((response)=>{
+                console.log(response)
+                return response.json()
+            }).then((data) => {
+                console.log(data);
+                let restaurants = data.restaurants;
+                console.log(restaurants," - init restaurants")
+                state.restaurants = restaurants;
+            });
         },
 
         addRest(state, name) {
@@ -21,7 +29,6 @@ export default new Vuex.Store({
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: JSON.stringify({ RestName: name })
             })
@@ -42,7 +49,6 @@ export default new Vuex.Store({
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: JSON.stringify({ RestName: rest })
             })

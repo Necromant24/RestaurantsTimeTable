@@ -26,22 +26,9 @@ export default {
         textField: ""
     }
   },
-  created: function () {
-      fetch('http://localhost:5000/Restaurants',{
-        method: 'GET',
-        }).then((response)=>{
-            console.log(response)
-            return response.json()
-        }).then((data) => {
-            console.log(data);
-            this.initRestaurants(data['restaurants'])
-        });
-
-  },
   methods: {
       deleteRest(index){
           rStore.commit('deleteRest',index)
-
       },
       addRest(){
           rStore.commit('addRest',this.textField)

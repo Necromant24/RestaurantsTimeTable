@@ -7,7 +7,9 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
+        previousWeekList:[],
         weekList:[],
+        nextWeekList:[],
         weekDays:[]
     },
     mutations: {
@@ -27,12 +29,25 @@ export default new Vuex.Store({
         initTimeTableOnWeek(state,data){
             console.log(data," - is raspdata to send")
 
+            let previousWeekDate = moment(data.date).add(-8,'days').format('YYYY MM DD').replace(' ','-')
+            let nextWeekDate = moment(data.date).add(7,'days').format('YYYY MM DD').replace(' ','-')
 
-            var url = new URL("http://localhost:5000/TimeTable")
+
             // date=2020-03-01&daysCount=2&restaurant=rusich&coockType=rus
-            var params = {date:data.date,daysCount:7,restaurant:data.restaurant,coockType:data.typeCoock}
 
+            let url = new URL("http://localhost:5000/TimeTable")
+            let params = {date:data.date,daysCount:7,restaurant:data.restaurant,coockType:data.typeCoock}
             url.search = new URLSearchParams(params).toString();
+
+            let urlPrevious = new URL("http://localhost:5000/TimeTable")
+            let paramsPrevious = {date:previousWeekDate,daysCount:7,restaurant:data.restaurant,coockType:data.typeCoock}
+            urlPrevious.search = new URLSearchParams(paramsPrevious).toString();
+
+            let urlNext = new URL("http://localhost:5000/TimeTable")
+            let paramsNext = {date:nextWeekDate,daysCount:7,restaurant:data.restaurant,coockType:data.typeCoock}
+            urlNext.search = new URLSearchParams(paramsNext).toString();
+
+
 
             console.log(url)
 
@@ -68,6 +83,78 @@ export default new Vuex.Store({
                     console.log(state.weekDays," - week days")
 
                 });
+
+
+            // fetch previous&next week
+
+            fetch(urlPrevious, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            })
+                .then(data => {
+                    return data.json();
+                })
+                .then(jsonData => {
+                    console.log(jsonData," - fetched raspisanie");
+
+                    const get7Dates3 = function(date){
+                        const getDays = (day=1) => Array.from({length:day},(_,i)=>moment(date).add(i-7, 'days').format('YYYY MM DD'));
+
+                        return getDays(7).map(date=>date.replace(' ','-')).map(date=>date.replace(' ','-'))
+                    }
+
+                    state.weekDays = Object.keys(jsonData)
+
+                    let dates7 = get7Dates3(data.date)
+                    let wList = []
+
+                    dates7.forEach(wday=>wList.push(Object.assign({date:wday},jsonData[wday])))
+
+                    console.log(wList," - wlist")
+
+                    state.previousWeekList = wList
+
+                    console.log(state.weekDays," - week days")
+
+                });
+
+
+            fetch(urlNext, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            })
+                .then(data => {
+                    return data.json();
+                })
+                .then(jsonData => {
+                    console.log(jsonData," - fetched raspisanie next");
+
+                    const get7Dates3 = function(date){
+                        const getDays = (day=1) => Array.from({length:day},(_,i)=>moment(date).add(i+7, 'days').format('YYYY MM DD'));
+
+                        return getDays(7).map(date=>date.replace(' ','-')).map(date=>date.replace(' ','-'))
+                    }
+
+                    state.weekDays = Object.keys(jsonData)
+
+                    let dates7 = get7Dates3(data.date)
+                    let wList = []
+
+                    dates7.forEach(wday=>wList.push(Object.assign({date:wday},jsonData[wday])))
+
+                    console.log(wList," - wlist")
+
+                    state.nextWeekList = wList
+
+                    console.log(state.weekDays," - week days")
+
+                });
+
+
         },
 
         // readding worker list
@@ -83,6 +170,70 @@ export default new Vuex.Store({
 
             console.log(workerData," - worker data")
 
+            // let daysWork = 0;
+            // let daysUnwork = 0;
+            // if(workerData.timetable.toString()==="2/2"){
+            //     daysWork=2
+            //     daysUnwork=2
+            // }else {
+            //     daysWork=5
+            //     daysUnwork=2
+            // }
+            //
+            // let dayWorksCount = 0
+            // let dayUnworksCount = 0
+            //
+            // let lastWorkDay = 0
+            // let firstWorkDay = data.dayIndex
+
+
+
+
+
+            // block of code with 4 fors to check valid work/unwork intervals
+            // console.log("----------------")
+            //             // for(let i=data.dayIndex;i<7;i++){
+            //             //     if(state.weekList[i].workers.includes(data.name))
+            //             //     {
+            //             //         dayWorksCount+=1
+            //             //         lastWorkDay = i
+            //             //         console.log(dayWorksCount)
+            //             //     }else {
+            //             //         break
+            //             //     }
+            //             // }
+            //             // console.log("----------------")
+            //             //
+            //             // for(let i=lastWorkDay+1;i<7;i++){
+            //             //     if(!state.weekList[i].workers.includes(data.name))
+            //             //     {
+            //             //         dayUnworksCount+=1
+            //             //     }else {
+            //             //         break
+            //             //     }
+            //             // }
+            //             //
+            //             // console.log("----------------")
+            //             // for(let i=data.dayIndex-1;i>=0;i--){
+            //             //     if(state.weekList[i].workers.includes(data.name))
+            //             //     {
+            //             //         dayWorksCount+=1
+            //             //         firstWorkDay = i
+            //             //         console.log(dayWorksCount)
+            //             //     }else {
+            //             //         break
+            //             //     }
+            //             // }
+            //             // console.log("----------------")
+            //             //
+            //             // for(let i=firstWorkDay-1;i>=0;i--){
+            //             //     if(!state.weekList[i].workers.includes(data.name))
+            //             //     {
+            //             //         dayUnworksCount+=1
+            //             //     }else {
+            //             //         break
+            //             //     }
+            //             // }
             let daysWork = 0;
             let daysUnwork = 0;
             if(workerData.timetable.toString()==="2/2"){
@@ -99,57 +250,52 @@ export default new Vuex.Store({
             let lastWorkDay = 0
             let firstWorkDay = data.dayIndex
 
+            let longWeeksList = [].concat(state.previousWeekList,state.weekList).concat(state.nextWeekList)
 
+            console.log(longWeeksList," - long week list")
 
-
-
-            // block of code with 4 fors to check valid work/unwork intervals
-            console.log("----------------")
-            for(let i=data.dayIndex;i<7;i++){
-                if(state.weekList[i].workers.includes(data.name))
+            let dayIndex = data.dayIndex
+            let shouldBreak = 0
+            for(let i=0;i<daysWork;i++){
+                if(longWeeksList[dayIndex+i].workers.includes(data.name))
                 {
                     dayWorksCount+=1
-                    lastWorkDay = i
-                    console.log(dayWorksCount)
                 }else {
+                    lastWorkDay=dayIndex+i-1
+                    ++shouldBreak
+                }
+                if(longWeeksList[dayIndex-i-1].workers.includes(data.name))
+                {
+                    dayWorksCount+=1
+                }else {
+                    firstWorkDay=dayIndex-i
+                    ++shouldBreak
+                }
+                if(shouldBreak>=2){
                     break
                 }
-            }
-            console.log("----------------")
 
-            for(let i=lastWorkDay+1;i<7;i++){
-                if(!state.weekList[i].workers.includes(data.name))
+            }
+
+
+            shouldBreak = 0
+            for(let i=0;i<daysUnwork;i++){
+                if(!longWeeksList[lastWorkDay+i+1].workers.includes(data.name))
                 {
                     dayUnworksCount+=1
                 }else {
-                    break
+                    ++shouldBreak
                 }
-            }
-
-            console.log("----------------")
-            for(let i=data.dayIndex-1;i>=0;i--){
-                if(state.weekList[i].workers.includes(data.name))
-                {
-                    dayWorksCount+=1
-                    firstWorkDay = i
-                    console.log(dayWorksCount)
-                }else {
-                    break
-                }
-            }
-            console.log("----------------")
-
-            for(let i=firstWorkDay-1;i>=0;i--){
-                if(!state.weekList[i].workers.includes(data.name))
+                if(!longWeeksList[firstWorkDay-i-1].workers.includes(data.name))
                 {
                     dayUnworksCount+=1
                 }else {
+                    ++shouldBreak
+                }
+                if(shouldBreak>=2){
                     break
                 }
             }
-
-
-
 
 
 

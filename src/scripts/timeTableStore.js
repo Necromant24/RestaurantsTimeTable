@@ -80,9 +80,12 @@ export default new Vuex.Store({
 
             let workerData = workerStore.state.dictWorkersData[data.name]
 
+
+            console.log(workerData," - worker data")
+
             let daysWork = 0;
             let daysUnwork = 0;
-            if(workerData.Timetable==="2/2"){
+            if(workerData.timetable.toString()==="2/2"){
                 daysWork=2
                 daysUnwork=2
             }else {
@@ -101,16 +104,18 @@ export default new Vuex.Store({
 
 
             // block of code with 4 fors to check valid work/unwork intervals
+            console.log("----------------")
             for(let i=data.dayIndex;i<7;i++){
                 if(state.weekList[i].workers.includes(data.name))
                 {
                     dayWorksCount+=1
                     lastWorkDay = i
-                    console.log(state.weekList[i].workers)
+                    console.log(dayWorksCount)
                 }else {
                     break
                 }
             }
+            console.log("----------------")
 
             for(let i=lastWorkDay+1;i<7;i++){
                 if(!state.weekList[i].workers.includes(data.name))
@@ -121,16 +126,18 @@ export default new Vuex.Store({
                 }
             }
 
+            console.log("----------------")
             for(let i=data.dayIndex-1;i>=0;i--){
                 if(state.weekList[i].workers.includes(data.name))
                 {
                     dayWorksCount+=1
                     firstWorkDay = i
-                    console.log(state.weekList[i].workers)
+                    console.log(dayWorksCount)
                 }else {
                     break
                 }
             }
+            console.log("----------------")
 
             for(let i=firstWorkDay-1;i>=0;i--){
                 if(!state.weekList[i].workers.includes(data.name))
@@ -147,7 +154,7 @@ export default new Vuex.Store({
 
 
             console.log(daysUnwork,daysWork," -daysUnwork,daysWork")
-            console.log(dayUnworksCount,dayUnworksCount,"-daysUnworksCount,daysWorksCount")
+            console.log(dayUnworksCount,dayWorksCount,"-daysUnworksCount,daysWorksCount")
             console.log(lastWorkDay,firstWorkDay,' - lastWorkDay,firstWorkDay')
 
             if(dayWorksCount>daysWork){

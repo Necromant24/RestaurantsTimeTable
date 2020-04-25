@@ -29,7 +29,7 @@ export default new Vuex.Store({
         initTimeTableOnWeek(state,data){
             console.log(data," - is raspdata to send")
 
-            let previousWeekDate = moment(data.date).add(-8,'days').format('YYYY MM DD').replace(' ','-')
+            let previousWeekDate = moment(data.date).add(-7,'days').format('YYYY MM DD').replace(' ','-')
             let nextWeekDate = moment(data.date).add(7,'days').format('YYYY MM DD').replace(' ','-')
 
 
@@ -97,7 +97,7 @@ export default new Vuex.Store({
                     return data.json();
                 })
                 .then(jsonData => {
-                    console.log(jsonData," - fetched raspisanie");
+                    console.log(jsonData," - fetched raspisanie previous");
 
                     const get7Dates3 = function(date){
                         const getDays = (day=1) => Array.from({length:day},(_,i)=>moment(date).add(i-7, 'days').format('YYYY MM DD'));
@@ -248,9 +248,14 @@ export default new Vuex.Store({
             let dayUnworksCount = 0
 
             let lastWorkDay = 0
-            let firstWorkDay = data.dayIndex
+            let firstWorkDay = data.dayIndex+7
+            // TODO: fix bug with 1st work day because it sets wrong index of item in longWeekList
 
             let longWeeksList = [].concat(state.previousWeekList,state.weekList).concat(state.nextWeekList)
+
+            console.log(state.previousWeekList," previous")
+            console.log(state.weekList," curr")
+            console.log(state.nextWeekList," next")
 
             console.log(longWeeksList," - long week list")
 
@@ -280,6 +285,7 @@ export default new Vuex.Store({
 
             shouldBreak = 0
             for(let i=0;i<daysUnwork;i++){
+                console.log(i,longWeeksList[firstWorkDay-i-1],firstWorkDay-i-1," - days should unwork")
                 if(!longWeeksList[lastWorkDay+i+1].workers.includes(data.name))
                 {
                     dayUnworksCount+=1

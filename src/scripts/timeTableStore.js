@@ -244,11 +244,13 @@ export default new Vuex.Store({
                 daysUnwork=2
             }
 
-            let dayWorksCount = 0
-            let dayUnworksCount = 0
+            let dayWorksCount = 1
+            let dayUnworksCountPrevious = 0
+            let dayUnworksCountNext = 0
 
-            let lastWorkDay = 0
+            let lastWorkDay = data.dayIndex+7
             let firstWorkDay = data.dayIndex+7
+            //let addedDayIndex = data.dayIndex+7
             // TODO: fix bug with 1st work day because it sets wrong index of item in longWeekList
 
             let longWeeksList = [].concat(state.previousWeekList,state.weekList).concat(state.nextWeekList)
@@ -259,46 +261,50 @@ export default new Vuex.Store({
 
             console.log(longWeeksList," - long week list")
 
-            let dayIndex = data.dayIndex
-            let shouldBreak = 0
+            let dayIndex = data.dayIndex+7
+            let nextWorkDaysEnded = false
+            let previousWorkDaysEnded = false
             for(let i=0;i<daysWork;i++){
-                if(longWeeksList[dayIndex+i].workers.includes(data.name))
+                if(longWeeksList[dayIndex+i+1].workers.includes(data.name))
                 {
                     dayWorksCount+=1
                 }else {
-                    lastWorkDay=dayIndex+i-1
-                    ++shouldBreak
+                    lastWorkDay=dayIndex+i
+                    nextWorkDaysEnded = true
                 }
                 if(longWeeksList[dayIndex-i-1].workers.includes(data.name))
                 {
                     dayWorksCount+=1
                 }else {
                     firstWorkDay=dayIndex-i
-                    ++shouldBreak
+                    previousWorkDaysEnded = true
                 }
-                if(shouldBreak>=2){
+                if(previousWorkDaysEnded&&nextWorkDaysEnded){
+                    console.log(" w days ended")
                     break
                 }
 
             }
 
 
-            shouldBreak = 0
+            let nextUnworksEnough = false
+            let previousUnworksEnougth = false
             for(let i=0;i<daysUnwork;i++){
-                console.log(i,longWeeksList[firstWorkDay-i-1],firstWorkDay-i-1," - days should unwork")
+                //console.log(i,longWeeksList[firstWorkDay-i-1],firstWorkDay-i-1," - days should unwork")
                 if(!longWeeksList[lastWorkDay+i+1].workers.includes(data.name))
                 {
-                    dayUnworksCount+=1
+                    dayUnworksCountNext+=1
                 }else {
-                    ++shouldBreak
+                    nextUnworksEnough = true
                 }
                 if(!longWeeksList[firstWorkDay-i-1].workers.includes(data.name))
                 {
-                    dayUnworksCount+=1
+                    dayUnworksCountPrevious+=1
                 }else {
-                    ++shouldBreak
+                    previousUnworksEnougth = true
                 }
-                if(shouldBreak>=2){
+                if(nextUnworksEnough&&previousUnworksEnougth){
+                    console.log(" unworks enouth")
                     break
                 }
             }
@@ -306,14 +312,15 @@ export default new Vuex.Store({
 
 
             console.log(daysUnwork,daysWork," -daysUnwork,daysWork")
-            console.log(dayUnworksCount,dayWorksCount,"-daysUnworksCount,daysWorksCount")
+            console.log(dayUnworksCountPrevious,dayWorksCount,dayUnworksCountNext,
+                "-dayUnworksCountPrevious,daysWorksCount,dayUnworksCountNext")
             console.log(lastWorkDay,firstWorkDay,' - lastWorkDay,firstWorkDay')
 
             if(dayWorksCount>daysWork){
                 alert('слишком много дней он работает')
             }
 
-            if(dayUnworksCount<daysUnwork){
+            if((dayUnworksCountPrevious<daysUnwork)||(dayUnworksCountNext<daysUnwork)){
                 alert('слишком малый интервал отдыха после')
             }
 

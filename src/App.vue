@@ -15,9 +15,7 @@
       <WorkersTimeTable />
     </div>
     <div v-if="state == 2">
-
     </div>
-
     <div v-if="state == 3">
       <Restaurants/>
     </div>
